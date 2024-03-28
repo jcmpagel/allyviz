@@ -1,0 +1,323 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+#loadingSymbol{
+    font-size: 3vw; /* Adjust base font size for loading text */
+    color: #333; /* Dark text for contrast */
+    text-align: center; /* Center the loading text */
+    padding: 20px; /* Add some padding around the text */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+
+#accessibilityFacts{
+    font-size: 3vw; /* Larger font size for the facts */
+    font-weight: bold; /* Make the facts bold */
+    margin-top: 10px; /* Space between the loading text and the facts */
+    color: #007bff; /* A pleasant blue for the facts */
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2); /* Soft shadow for depth */
+    max-width: 80%; /* Limit the width to ensure it fits on screen */
+    line-height: 1.4; /* Improve readability with more line height */
+}
+
+#estimatedTime {
+    display: block; /* Treat the span like a block element to take up the full width */
+    width: 100%; /* Ensure it spans the full width of its container */
+    text-align: center; /* Center the text */
+    padding: 10px 0; /* Add some vertical padding */
+    font-size: 4vw; /* Slightly larger font size for readability */
+    font-weight: bold; /* Make the text bold */
+    border-radius: 5px; /* Rounded corners for a modern look */
+    margin: 20px 0; /* Add some margin above and below */
+}
+
+.how-it-works {
+    text-align: center; /* Center the text for better alignment with the button above */
+    margin-top: 10px; /* Adds a little space above for separation */
+    margin-bottom: 20px; /* Adds some space below before the main content */
+    margin-left: 20px; /* Increases left margin */
+    margin-right: 20px; /* Increases right margin */
+    font-size: 0.9em; /* Keeps the text size small to make the section compact */
+}
+
+.how-it-works a {
+    color: #0056b3; /* Match the link color to your button for consistency */
+    text-decoration: none; /* Optional: removes underline from links */
+    text-decoration: underline
+}
+.container {
+    display: flex;
+    flex: 1;
+    overflow: hidden; /* Consider if 'hidden' is appropriate for your layout */
+}
+.screenshot-section, .audit-section {
+    overflow-y: auto;
+    padding: 20px;
+}
+.screenshot-section {
+    position: relative;
+    flex: 2;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #ccc;
+}
+.overlay {
+    position: absolute;
+    border: 2px solid red;
+    z-index: 20;
+    box-sizing: border-box;
+    pointer-events: none; /* Updated to allow clicks through overlay, if necessary */
+}
+/* New tooltip styles */
+.tooltip {
+    position: absolute;
+    bottom: 100%; /* Position above the overlay */
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: black;
+    color: white;
+    text-align: center;
+    border-radius: 6px;
+    padding: 5px 10px;
+    z-index: 30; /* Ensure tooltip is above overlay */
+
+    /* Hide tooltip arrow for simplicity, can be added if desired */
+    visibility: hidden; /* Initially hidden, shown on overlay hover */
+    white-space: nowrap; /* Prevents the text from wrapping */
+}
+/* Optionally add an arrow to the tooltip */
+.tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: black transparent transparent transparent;
+}
+.color-box {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-left: 4px;
+    border: 1px solid #000;
+    vertical-align: middle;
+}
+.visually-hidden {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    border: 0;
+    padding: 0;
+    white-space: nowrap;
+    clip-path: inset(50%);
+    clip: rect(0 0 0 0);
+    overflow: hidden;
+}
+.audit-section {
+    flex: 1;
+}
+.screenshot-section img {
+    width: 100%;
+    max-height: none;
+    object-fit: contain;
+    display: block;
+}
+
+.screenshot-wrapper {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.audit-detail {
+    margin-bottom: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    border-radius: 5px;
+}
+
+.audit-detail h3 {
+    margin-top: 0;
+}
+
+.item-detail {
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.item-detail p {
+    margin: 5px 0;
+}
+
+.item-detail strong {
+    font-weight: bold;
+}
+.global-tooltip {
+    max-width: 300px; /* Adjust based on your preference */
+    white-space: normal; /* Override previous nowrap setting to allow wrapping */
+    text-align: left;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: black;
+    color: white;
+    position: fixed;
+    visibility: hidden;
+    z-index: 1000; /* High value to ensure it's above all */
+    pointer-events: none; /* Prevents the tooltip from interfering with mouse events */
+}
+
+.breakable-text {
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: auto;
+  }
+  
+  /* Custom styling for code snippets */
+  .snippet-code {
+    white-space: pre-wrap; /* Allows the text to wrap */
+  }
+/* Flexbox-Container */
+.url-input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px; /* Abstand zwischen den Elementen */
+}
+
+/* Stil für das Eingabefeld */
+.url-input-container input[type="text"] {
+    flex-grow: 1;
+    padding: 12px 20px;
+    border: 1px solid #ccc;
+    border-radius: 30px; /* Abgerundete Ecken */
+    font-size: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtiler Schatten */
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+.overlay.hidden {
+    display: none;
+}
+
+.item-detail.collapsed {
+    display: none;
+}
+.details-list.collapsed {
+    display: none;
+}
+.color-box {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-left: 5px;
+}
+/* Ensure you have styles for .hidden to hide the overlays as previously discussed */
+.audit-detail button {
+    width: 100%; /* Makes the button take full width of its parent */
+    padding: 10px 0; /* Gives the button a nice amount of vertical padding */
+    background-color: #0056b3; /* Blue background color */
+    color: white; /* Text color */
+    border: none; /* No border */
+    border-radius: 4px; /* Rounded corners */
+    margin-top: 10px; /* Adds some space above the button */
+    cursor: pointer; /* Changes the mouse cursor to a pointer */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adds a subtle shadow for depth */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.audit-detail button:hover {
+    background-color: #0056b3; /* Darker blue on hover for a visual feedback */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3); /* Slightly deeper shadow on hover */
+}
+
+/* Stil für die Schaltfläche */
+.url-input-container button {
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    background-color: #0056b3; /* Blauton */
+    color: white;
+    border-radius: 30px; /* Abgerundete Ecken */
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); /* Subtiler Schatten */
+    transition: background-color 0.3s, box-shadow 0.3s;
+}
+
+/* Hover-Effekte */
+.url-input-container input[type="text"]:hover,
+.url-input-container input[type="text"]:focus {
+    border-color: #0056b3; /* Blauton beim Hover/Fokus */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.url-input-container button:hover {
+    background-color: #0056b3; /* Dunklerer Blauton beim Hover */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+.mobile-only-message {
+    display: none;
+    text-align: center; /* Center the text for better readability */
+    padding: 0px; /* Add some padding around the text */
+    background-color: #f8d7da; /* Light red background for visibility */
+    color: #2f0206; /* Dark red text color for readability */
+    border-radius: 0px; /* Rounded corners */
+    margin: 0px; /* Adds some margin around the message */
+    font-size: 0.5em; /* Slightly smaller font size */
+}
+.mobile-text {
+    display: none; /* Default: do not display */
+    font-size: 0.50rem; /* Adjusts the size to be smaller */
+    padding: 0px;
+    margin: 0px; /* Adds some space above and below */
+    text-align: center; /* Centers the text */
+  }
+  
+  @media screen and (max-width: 768px) {
+    .container {
+        flex-direction: column-reverse;
+    }
+    
+    .url-input-container input[type="text"] {
+        font-size: 16px; /* Größere Schrift für bessere Lesbarkeit */
+        padding: 10px; /* Mehr innen Abstand für bessere Touch-Zielfläche */
+        margin-bottom: 10px; /* Abstand zum Button hinzufügen */
+    }
+    
+    .url-input-container button {
+        font-size: 16px; /* Größere Schrift für bessere Sichtbarkeit */
+        padding: 12px 20px; /* Größere Touch-Zielfläche */
+        width: 100%; /* Button volle Breite für einfacheren Zugriff */
+        margin: 0; /* Entfernt zusätzlichen Abstand, falls vorhanden */
+        cursor: pointer; /* Cursor zum Klick-Symbol ändern, um Interaktivität anzudeuten */
+        border: none; /* Entfernt den Standard-Rand */
+        background-color: #0056b3; /* Hintergrundfarbe für Button */
+        color: white; /* Schriftfarbe für Button */
+        border-radius: 5px; /* Abgerundete Ecken für modernes Aussehen */
+    }
+    .how-it-works {
+        display: none; /* Hide the section on small screens */
+    }
+    .mobile-only-message {
+        display: block;
+    }
+
+    .mobile-text {
+        display: block; /* Only display on small screens */
+    
+}
+
