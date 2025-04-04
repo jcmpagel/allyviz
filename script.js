@@ -171,7 +171,7 @@ if (pageUrlFromQuery) {
         const finishTime = new Date(startTime + 90000); // 90 seconds from now
         estimatedTime.textContent = `Analyzing Webpage the estimated finish time is: ${finishTime.toLocaleTimeString()}`;
         
-        const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(pageUrl)}&strategy=desktop&category=accessibility&key=AIzaSyCNbzAWTKUFZN2IVtnDbTw5KDvM5nFsAsI`;
+        const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(pageUrl)}&strategy=desktop&category=accessibility`;
         console.log(`Fetching: ${apiUrl}`);
         
         fetch(apiUrl)
