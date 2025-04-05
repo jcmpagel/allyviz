@@ -66,7 +66,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "62% of U.S. adults with a disability say they own a desktop or laptop computer, compared with 81% of those without a disability.",
         "An estimated 1.3 billion people – or 1 in 6 people worldwide – experience significant disability.",
         "89.1% of web accessibility practitioners indicated that better web sites would have a bigger impact on accessibility than better assistive technology and browsers in 2021.",
-        "15% of disabled people say they “never” go online."
+        "15% of disabled people say they 'never' go online."  // Changed to single quotes
     ];
 /**
  * Randomly selects an accessibility fact from the list and updates the loading symbol's text content with it.
@@ -79,7 +79,7 @@ function rotateAccessibilityFacts() {
     // Get the current text of the loading symbol element
     const loadingText = document.getElementById('loadingSymbol').textContent;
     // Update the loading symbol's text content with the selected fact
-    document.getElementById('loadingSymbol').textContent = loadingText.split('.')[0] + '. ' + factText;
+    document.getElementById('accessibilityFacts').textContent = factText;
 }
 
 /**
@@ -118,7 +118,60 @@ function hideLoading() {
  */
 function displayNoAuditsMessage() {
     // Set the innerHTML of the auditSection to display a success message
-    auditSection.innerHTML = '<p>Good news! No accessibility issues found.</p>';
+    auditSection.innerHTML = '<div class="audit-detail"><h3>Good news!</h3><p>No accessibility issues found on this page.</p></div>';
+}
+
+/**
+ * Determine severity class based on audit details
+ * @param {Object} audit - The audit object
+ * @return {string} - The severity class (critical, serious, moderate, minor)
+ */
+function determineSeverity(audit) {
+    const auditId = audit.id || '';
+    const auditTitle = audit.title?.toLowerCase() || '';
+    
+    // Critical issues
+    if (
+        auditTitle.includes('contrast') || 
+        auditId.includes('color-contrast') || 
+        auditTitle.includes('keyboard') || 
+        auditId.includes('keyboard') ||
+        auditTitle.includes('alt text') || 
+        auditId.includes('alt-text') ||
+        auditTitle.includes('html lang') || 
+        auditId.includes('html-lang')
+    ) {
+        return 'critical';
+    }
+    
+    // Serious issues
+    else if (
+        auditTitle.includes('aria') || 
+        auditId.includes('aria') || 
+        auditTitle.includes('heading') || 
+        auditId.includes('heading') ||
+        auditTitle.includes('label') || 
+        auditId.includes('label')
+    ) {
+        return 'serious';
+    }
+    
+    // Moderate issues
+    else if (
+        auditTitle.includes('focus') || 
+        auditId.includes('focus') || 
+        auditTitle.includes('semantic') || 
+        auditId.includes('semantic') ||
+        auditTitle.includes('structure') || 
+        auditId.includes('structure')
+    ) {
+        return 'moderate';
+    }
+    
+    // Default to minor
+    else {
+        return 'minor';
+    }
 }
 
 /**
@@ -126,19 +179,41 @@ function displayNoAuditsMessage() {
  */
 screenshotWrapper.addEventListener('mousemove', (e) => {
     let tooltipShown = false;
-    // Iterate over each overlay element
+    
     document.querySelectorAll('.overlay').forEach(overlay => {
-        // Get the bounding rectangle of the overlay
         const rect = overlay.getBoundingClientRect();
-        // Check if the mouse is over the overlay
-        if (e.clientX >= rect.left && e.clientX <= rect.right && e.clientY >= rect.top && e.clientY <= rect.bottom) {
-            // Get the explanation data attribute and show the tooltip
+        
+        // Check if the mouse is over this overlay
+        if (e.clientX >= rect.left && e.clientX <= rect.right && 
+            e.clientY >= rect.top && e.clientY <= rect.bottom) {
+            
+            // Get the explanation and show tooltip
             const explanation = overlay.getAttribute('data-explanation');
-            showTooltip(explanation, e.clientX + 10, e.clientY + 10);
-            tooltipShown = true;
+            if (explanation) {
+                showTooltip(explanation, e.clientX + 10, e.clientY + 10);
+                tooltipShown = true;
+                
+                // Highlight the active overlay
+                overlay.style.zIndex = '30'; // Bring to front
+                overlay.style.backgroundColor = 'rgba(37, 99, 235, 0.2)';
+            }
+        } else {
+            // Reset overlay styling when not hovered
+            overlay.style.zIndex = '20';
+            
+            // Restore original background color based on class
+            if (overlay.classList.contains('critical')) {
+                overlay.style.backgroundColor = 'rgba(239, 68, 68, 0.15)';
+            } else if (overlay.classList.contains('serious')) {
+                overlay.style.backgroundColor = 'rgba(245, 158, 11, 0.15)';
+            } else if (overlay.classList.contains('moderate')) {
+                overlay.style.backgroundColor = 'rgba(234, 179, 8, 0.15)';
+            } else {
+                overlay.style.backgroundColor = 'rgba(102, 102, 102, 0.1)';
+            }
         }
     });
-    // Hide the tooltip if the mouse is not over any overlay
+    
     if (!tooltipShown) {
         globalTooltip.style.visibility = 'hidden';
     }
@@ -160,8 +235,9 @@ if (pageUrlFromQuery) {
         clearOverlays();
         screenshotWrapper.style.display = 'none';
         auditSection.innerHTML = '';
-        loadingSymbol.style.display = 'block';
+        loadingSymbol.style.display = 'flex'; // Changed to flex to ensure proper alignment
         estimatedTime.style.display = 'block';
+        estimatedTime.classList.add('active');
         
         // Start rotating accessibility facts
         rotateAccessibilityFacts(); // Show the first fact immediately
@@ -171,20 +247,26 @@ if (pageUrlFromQuery) {
         const finishTime = new Date(startTime + 90000); // 90 seconds from now
         estimatedTime.textContent = `Analyzing Webpage the estimated finish time is: ${finishTime.toLocaleTimeString()}`;
         
-        const apiUrl = `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=${encodeURIComponent(pageUrl)}&strategy=desktop&category=accessibility`;
-        console.log(`Fetching: ${apiUrl}`);
+    // With this new API endpoint:
+    const apiUrl = `https://allyviz-api.jcmpagel.workers.dev/?url=${encodeURIComponent(pageUrl)}`;
+    
+    console.log(`Fetching: ${apiUrl}`);
         
         fetch(apiUrl)
             .then(response => {
+                console.log('API response status:', response.status);
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 return response.json();
             })
             .then(data => {
+                console.log('Data received, has lighthouse result:', !!data.lighthouseResult);
+                console.log('Has full page screenshot:', !!(data.lighthouseResult && data.lighthouseResult.fullPageScreenshot));
+                
                 if (data.lighthouseResult && data.lighthouseResult.fullPageScreenshot) {
                     const screenshotData = data.lighthouseResult.fullPageScreenshot.screenshot.data;
-                    console.log('Screenshot data retrieved:', screenshotData);
+                    console.log('Screenshot data retrieved:', screenshotData.substring(0, 50) + '...');
                     positionOverlays(data.lighthouseResult.fullPageScreenshot.screenshot, data.lighthouseResult.audits);
                 } else {
                     throw new Error('No lighthouse results available.');
@@ -230,125 +312,198 @@ function updateBrowserUrl(pageUrl) {
     
 function positionOverlays(screenshot, audits) {
     console.log('Positioning overlays...');
-    screenshotImg.onload = () => {
-        console.log('Image loaded, setting up overlays.');
-        const scaleX = screenshotImg.offsetWidth / screenshot.width;
-        const scaleY = screenshotImg.offsetHeight / screenshot.height;
+    screenshotImg.onload = function() {
+        console.log('Screenshot loaded with dimensions:', screenshotImg.width, 'x', screenshotImg.height);
+        
+        // Wait a bit to ensure image is fully rendered before calculating scale
+        setTimeout(() => {
+            const scaleX = screenshotImg.offsetWidth / screenshot.width;
+            const scaleY = screenshotImg.offsetHeight / screenshot.height;
+            
+            console.log('Scale factors:', scaleX, scaleY);
+            console.log('Screenshot dimensions:', screenshot.width, 'x', screenshot.height);
+            console.log('Image display dimensions:', screenshotImg.offsetWidth, 'x', screenshotImg.offsetHeight);
 
-        Object.keys(audits).forEach(auditKey => {
-            const audit = audits[auditKey];
-            if (audit.score !== 1 && audit.scoreDisplayMode === 'binary') {
-                let auditElem = auditSection.querySelector(`#audit-${auditKey}`);
-                if (!auditElem) {
-                    auditElem = document.createElement('div');
-                    auditElem.id = `audit-${auditKey}`;
-                    auditElem.classList.add('audit-detail');
-
-                    const updatedDescription = audit.description.replace(/\[Learn[^\]]+\]\(https?:\/\/[^\)]+\)\.?\s*/g, '').trim();
-                    auditElem.innerHTML = `<h3>${audit.title}</h3><p>${updatedDescription}</p>
-                    ${audit.description.includes('http') ? `<a href="${audit.description.match(/\(https:\/\/[^)]+\)/)[0].slice(1, -1)}" target="_blank">Learn more</a>` : ''}`;
-
-                    // Create the itemList
-                    const itemList = document.createElement('ul');
-                    itemList.classList.add('details-list');
-
-                    const toggleButton = document.createElement('button');
-                    toggleButton.innerText = 'Hide Details/Overlays';
+            Object.keys(audits).forEach(auditKey => {
+                const audit = audits[auditKey];
+                if (audit.score !== 1 && audit.scoreDisplayMode === 'binary') {
+                    // Determine severity for this audit
+                    const severity = determineSeverity(audit);
                     
-                    // Append the toggle button
-                    auditElem.appendChild(toggleButton);
+                    let auditElem = auditSection.querySelector(`#audit-${auditKey}`);
+                    if (!auditElem) {
+                        auditElem = document.createElement('div');
+                        auditElem.id = `audit-${auditKey}`;
+                        auditElem.classList.add('audit-detail');
+                        auditElem.setAttribute('data-severity', severity);
+
+                        const updatedDescription = audit.description.replace(/\[Learn[^\]]+\]\(https?:\/\/[^\)]+\)\.?\s*/g, '').trim();
+                        auditElem.innerHTML = `<h3>${audit.title} <span class="count"></span> <span class="color-box ${severity}-indicator"></span></h3><p>${updatedDescription}</p>
+                        ${audit.description.includes('http') ? `<a href="${audit.description.match(/\(https:\/\/[^)]+\)/)[0].slice(1, -1)}" target="_blank">Learn more</a>` : ''}`;
+
+                        // Create the itemList
+                        const itemList = document.createElement('ul');
+                        itemList.classList.add('details-list');
+
+                        const toggleButton = document.createElement('button');
+                        toggleButton.innerText = 'Hide Details/Overlays';
+                        toggleButton.setAttribute('aria-expanded', 'true');
+                        
+                        // Append the toggle button
+                        auditElem.appendChild(toggleButton);
+
+                        if (audit.details && audit.details.items) {
+                            let itemCount = 0;
+                            audit.details.items.forEach(item => {
+                                if (item.node && item.node.boundingRect) {
+                                    itemCount++;
+                                    const itemElem = document.createElement('li');
+                                    itemElem.classList.add('item-detail');
+                                    itemElem.innerHTML = `<strong>Error:</strong> <span class="breakable-text">${item.node.explanation}</span>
+                                    <br><strong>Selector:</strong> <span class="breakable-text">${item.node.selector}</span>
+                                    <br><strong>Path:</strong> <span class="breakable-text">${item.node.path}</span>`;
+                                    if (item.node.snippet) {
+                                        const codeElem = document.createElement('code');
+                                        codeElem.classList.add('breakable-text', 'snippet-code');
+                                        codeElem.textContent = item.node.snippet;
+                                        const snippetContainer = document.createElement('p');
+                                        snippetContainer.appendChild(document.createTextNode('Snippet: '));
+                                        snippetContainer.appendChild(codeElem);
+                                        itemElem.appendChild(snippetContainer);
+                                    }
+                                    itemList.appendChild(itemElem);
+                                }
+                            });
+                            
+                            // Update count display
+                            const countSpan = auditElem.querySelector('.count');
+                            if (countSpan) {
+                                countSpan.textContent = `${itemCount} issue${itemCount !== 1 ? 's' : ''}`;
+                            }
+                            
+                            auditElem.appendChild(itemList);
+                        }
+
+                        auditSection.appendChild(auditElem);
+
+                        toggleButton.addEventListener('click', function() {
+                            const overlays = document.querySelectorAll(`.overlay[data-audit="${auditKey}"]`);
+                            const isHidden = toggleButton.innerText.includes('Show');
+                            
+                            overlays.forEach(overlay => {
+                                isHidden ? overlay.classList.remove('hidden') : overlay.classList.add('hidden');
+                            });
+                            
+                            const expanded = toggleButton.getAttribute('aria-expanded') === 'true';
+                            toggleButton.setAttribute('aria-expanded', !expanded);
+                            toggleButton.innerText = isHidden ? 'Hide Details/Overlays' : 'Show Details/Overlays';
+                            
+                            if (!isHidden) {
+                                itemList.classList.add('collapsed');
+                            } else {
+                                itemList.classList.remove('collapsed');
+                            }
+                        });
+                    }
 
                     if (audit.details && audit.details.items) {
                         audit.details.items.forEach(item => {
-                            const itemElem = document.createElement('li');
-                            itemElem.classList.add('item-detail');
-                            itemElem.innerHTML = `<strong>Error:</strong> <span class="breakable-text">${item.node.explanation}</span>
-                            <br><strong>Selector:</strong> <span class="breakable-text">${item.node.selector}</span>
-                            <br><strong>Path:</strong> <span class="breakable-text">${item.node.path}</span>`;
-                            if (item.node.snippet) {
-                                const codeElem = document.createElement('code');
-                                codeElem.classList.add('breakable-text', 'snippet-code');
-                                codeElem.textContent = item.node.snippet;
-                                const snippetContainer = document.createElement('p');
-                                snippetContainer.appendChild(document.createTextNode('Snippet: '));
-                                snippetContainer.appendChild(codeElem);
-                                itemElem.appendChild(snippetContainer);
+                            if (item.node && item.node.boundingRect) {
+                                const overlay = document.createElement('div');
+                                overlay.className = 'overlay';
+                                
+                                // Add severity class
+                                overlay.classList.add(severity);
+                                overlay.setAttribute('data-severity', severity);
+                                
+                                overlay.setAttribute('data-audit', auditKey);
+                                overlay.style.width = `${item.node.boundingRect.width * scaleX}px`;
+                                overlay.style.height = `${item.node.boundingRect.height * scaleY}px`;
+                                overlay.style.left = `${item.node.boundingRect.left * scaleX}px`;
+                                overlay.style.top = `${item.node.boundingRect.top * scaleY}px`;
+                                let adjustedExplanation = item.node.explanation.replace('Fix any of the following:', '').trim();
+                                overlay.setAttribute('data-explanation', adjustedExplanation);
+                                overlay.setAttribute('data-selector', item.node.selector);
+                                overlay.setAttribute('role', 'button');
+                                overlay.setAttribute('aria-label', `Accessibility issue: ${adjustedExplanation}`);
+                                screenshotWrapper.appendChild(overlay);
                             }
-                            itemList.appendChild(itemElem);
                         });
-                        auditElem.appendChild(itemList);
                     }
-
-                    auditSection.appendChild(auditElem);
-
-                    toggleButton.addEventListener('click', function() {
-                        const overlays = document.querySelectorAll(`.overlay[data-audit="${auditKey}"]`);
-                        const isHidden = toggleButton.innerText.includes('Show');
-                        overlays.forEach(overlay => {
-                            isHidden ? overlay.classList.remove('hidden') : overlay.classList.add('hidden');
-                        });
-                        isHidden ? itemList.classList.remove('collapsed') : itemList.classList.add('collapsed');
-                        toggleButton.innerText = isHidden ? 'Hide Details/Overlays' : 'Show Details/Overlays';
-                    });
                 }
+            });
 
-                if (audit.details && audit.details.items) {
-                    audit.details.items.forEach(item => {
-                        if (item.node && item.node.boundingRect) {
-                            const overlay = document.createElement('div');
-                            overlay.className = 'overlay';
-                            overlay.setAttribute('data-audit', auditKey);
-                            overlay.style.width = `${item.node.boundingRect.width * scaleX}px`;
-                            overlay.style.height = `${item.node.boundingRect.height * scaleY}px`;
-                            overlay.style.left = `${item.node.boundingRect.left * scaleX}px`;
-                            overlay.style.top = `${item.node.boundingRect.top * scaleY}px`;
-                            let adjustedExplanation = item.node.explanation.replace('Fix any of the following:', '').trim();
-                            overlay.setAttribute('data-explanation', adjustedExplanation);
-                            overlay.setAttribute('data-selector', item.node.selector);
-                            screenshotWrapper.appendChild(overlay);
-                        }
-                    });
-                }
+            const failedAudits = Object.keys(audits).some(key => audits[key].score !== 1 && audits[key].scoreDisplayMode === 'binary');
+            if (!failedAudits) {
+                displayNoAuditsMessage();
             }
-        });
-
-        const failedAudits = Object.keys(audits).some(key => audits[key].score !== 1 && audits[key].scoreDisplayMode === 'binary');
-        if (!failedAudits) {
-            displayNoAuditsMessage();
-        }
+            
+            // Show the screenshot and wrapper
+            screenshotWrapper.style.display = 'block';
+            
+        }, 100); // Small delay to ensure the image is fully loaded
     };
 
+    // Set the source of the screenshot image
     screenshotImg.src = `${screenshot.data}`;
+    console.log('Set screenshot src:', screenshotImg.src.substring(0, 50) + '...');
 }
-
-toggleButton.setAttribute('aria-expanded', 'false'); // Initial state is collapsed
-toggleButton.addEventListener('click', function() {
-    const overlays = document.querySelectorAll(`.overlay[data-audit="${auditKey}"]`);
-    const isHidden = toggleButton.innerText.includes('Show');
-    overlays.forEach(overlay => {
-        isHidden ? overlay.classList.remove('hidden') : overlay.classList.add('hidden');
+    
+function adjustExplanationWithColors(text) {
+    // Regular expression to find hex codes
+    const hexCodeRegex = /#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g;
+    return text.replace(hexCodeRegex, (match) => {
+        return `${match} <span class="color-box" style="background-color: ${match};"></span>`;
     });
-    const expanded = toggleButton.getAttribute('aria-expanded') === 'true';
-    toggleButton.setAttribute('aria-expanded', !expanded);
-    toggleButton.innerText = isHidden ? 'Hide Details/Overlays' : 'Show Details/Overlays';
-    if (!isHidden) {
-        itemList.classList.add('collapsed');
-    } else {
-        itemList.classList.remove('collapsed');
-    }
+}
+    
 });
 
-
-overlay.setAttribute('role', 'alert');
-overlay.setAttribute('aria-live', 'assertive');
-
+document.getElementById('toggleAllOverlays').addEventListener('click', function() {
+    const overlays = document.querySelectorAll('.overlay');
+    const isAnyVisible = Array.from(overlays).some(overlay => !overlay.classList.contains('hidden'));
     
-    function adjustExplanationWithColors(text) {
-        // Regular expression to find hex codes
-        const hexCodeRegex = /#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g;
-        return text.replace(hexCodeRegex, (match) => {
-            return `${match} <span class="color-box" style="background-color: ${match};"></span>`;
-        });
-    }
+    overlays.forEach(overlay => {
+        if (isAnyVisible) {
+            overlay.classList.add('hidden');
+        } else {
+            overlay.classList.remove('hidden');
+        }
+    });
     
+    this.textContent = isAnyVisible ? 'Show All Overlays' : 'Hide All Overlays';
+});
+
+document.getElementById('filterIssues').addEventListener('change', function() {
+    const selectedValue = this.value;
+    console.log('Filter changed to:', selectedValue);
+    
+    const overlays = document.querySelectorAll('.overlay');
+    console.log('Total overlays:', overlays.length);
+    
+    let visibleCount = 0;
+    
+    overlays.forEach(overlay => {
+        const severity = overlay.getAttribute('data-severity');
+        
+        if (selectedValue === 'all' || severity === selectedValue) {
+            overlay.classList.remove('hidden');
+            visibleCount++;
+        } else {
+            overlay.classList.add('hidden');
+        }
+    });
+    
+    console.log('Visible overlays after filtering:', visibleCount);
+    
+    // Update the audit section items
+    const auditItems = document.querySelectorAll('.audit-detail');
+    auditItems.forEach(item => {
+        const severity = item.getAttribute('data-severity');
+        if (selectedValue === 'all' || severity === selectedValue) {
+            item.style.display = 'block';
+        } else {
+            item.style.display = 'none';
+        }
+    });
 });

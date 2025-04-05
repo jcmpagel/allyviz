@@ -2,68 +2,125 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Ensures proper rendering and touch zooming -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Accessibility Report Viewer</title>
-    <!-- Link to external CSS for styling -->
+    <meta name="description" content="AllyViz - Visual accessibility testing tool with 50+ tests">
+    <title>AllyViz - Accessibility Testing Tool</title>
     <link rel="stylesheet" href="style.css">
     <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Container for URL input -->
-    <div class="url-input-container">
-        <!-- Accessible label for the input field -->
-        <label for="urlInput" class="visually-hidden">Enter webpage URL</label>
-        <!-- Input field for entering a webpage URL -->
-        <input type="text" id="urlInput" placeholder="Enter webpage URL" style="width: 100%;" />
-        <!-- Button to check the accessibility of the entered URL -->
-        <button id="checkAccessibilityBtn">Check Accessibility</button>
-    </div>
+    <header>
+        <div class="logo">
+            <h1>AllyViz</h1>
+            <p class="tagline">Visual Accessibility Testing</p>
+        </div>
+        
+        <div class="url-input-container">
+            <label for="urlInput" class="visually-hidden">Enter webpage URL</label>
+            <div class="input-wrapper">
+                <input type="text" id="urlInput" placeholder="Enter any website URL (e.g., wikipedia.org)" />
+                <button id="checkAccessibilityBtn">Check Accessibility</button>
+            </div>
+        </div>
+    </header>
 
-    <!-- Message displayed only on mobile devices, suggesting to check on desktop -->
     <div id="mobileMessage" class="mobile-only-message">
-        Please save the page and check it on your desktop; it still sucks on mobile.
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12" y2="16"></line>
+        </svg>
+        <span>For best experience, please use a desktop device</span>
     </div>
 
     <div class="mobile-text">
-        <p><strong>50+ tests</strong> - <strong>Opensourced</strong> - <strong>No SignUp</strong> - <strong>unlimited requests</strong> - <strong>here to stay</strong></p>
-      </div>
-    <!-- Section explaining how the tool works -->
+        <p><span class="feature-tag">50+ tests</span> <span class="feature-tag">Open Source</span> <span class="feature-tag">No SignUp</span> <span class="feature-tag">Unlimited</span></p>
+    </div>
+
     <div class="how-it-works">
-        <p><strong>50+ tests</strong> - <strong>Opensourced</strong> - <strong>No SignUp</strong> - <strong>unlimited requests</strong> - <strong>here to stay</strong></p>
-        <p>How it works: Just <strong>submit</strong> an URL like https://en.wikipedia.org/wiki/Web_accessibility or wikipedia.org then <strong>click</strong> on "<strong>Check Accessibility</strong>" and wait for <strong>2min</strong>, if you are in the web <strong>you can just type allyviz.com/</strong> in front of every domain so it looks like this <strong>allyviz.com/https://en.wikipedia.org/</strong> <br>You can <strong>hover</strong> over each overlay to see more information <br> See how it works on <a href="https://github.com/jcmpagel/allyviz.com/" target="_blank">GitHub</a>. or <a href="https://jonathanpagel.com/donate/" target="_blank">buy me a coffee</a>.</p>
-        <p>Check my page for <a href="https://jonathanpagel.com/allyviz-com-a-visual-accessebility-tool/#why">the why</a>, <a href="https://jonathanpagel.com/allyviz-com-a-visual-accessebility-tool/#how">how it works</a>, or the <a href="https://jonathanpagel.com/allyviz-com-a-visual-accessebility-tool/#limitation">limitations</a>.</p>
+        <div class="features">
+            <span class="feature-tag">50+ tests</span>
+            <span class="feature-tag">Open Source</span>
+            <span class="feature-tag">No SignUp</span>
+            <span class="feature-tag">Unlimited</span>
+            <span class="feature-tag">Free Forever</span>
+        </div>
+        
+        <div class="instructions">
+            <h2>How to use AllyViz</h2>
+            <ol>
+                <li><strong>Enter</strong> a URL like <code>wikipedia.org</code> or <code>https://en.wikipedia.org/</code></li>
+                <li><strong>Click</strong> "Check Accessibility" and wait approximately 2 minutes</li>
+                <li><strong>Explore</strong> results by hovering over highlighted elements</li>
+            </ol>
+            <p>Shortcut: Type <code>allyviz.com/</code> before any URL: <code>allyviz.com/https://en.wikipedia.org/</code></p>
+            <div class="action-links">
+                <a href="https://github.com/jcmpagel/allyviz.com/" target="_blank" class="github-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    View on GitHub
+                </a>
+                <a href="https://jonathanpagel.com/donate/" target="_blank" class="donate-link">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                    Support this project
+                </a>
+            </div>
+            <div class="learn-more">
+                <a href="https://jonathanpagel.com/allyviz-com-a-visual-accessebility-tool/#why">Learn why</a> •
+                <a href="https://jonathanpagel.com/allyviz-com-a-visual-accessebility-tool/#how">How it works</a> •
+                <a href="https://jonathanpagel.com/allyviz-com-a-visual-accessebility-tool/#limitation">Limitations</a>
+            </div>
+        </div>
     </div>
 
-    <!-- Placeholder for estimated time, initially hidden -->
-    <span id="estimatedTime" style="width: 100%;"></span>
-    <!-- Container for the loading symbol, hidden by default -->
-    <div id="loadingSymbol" style="display: none;">
-        <!-- Placeholder for displaying accessibility facts -->
-        <p id="accessibilityFacts"></p>
+    <div id="estimatedTime" class="time-estimate" aria-live="polite"></div>
+    
+    <div id="loadingSymbol" class="loading-container">
+        <div class="loading-animation">
+            <div class="loading-circle"></div>
+        </div>
+        <p id="accessibilityFacts" class="accessibility-facts"></p>
     </div>
 
-    <!-- Main container for the screenshot and audit sections -->
-    <div class="container">
-        <!-- Section for displaying the webpage screenshot -->
+    <main class="container">
         <div class="screenshot-section" tabindex="0">
             <div class="screenshot-wrapper">
                 <img id="screenshot" src="" alt="Full Page Screenshot of the accessibility tested webpage">
             </div>
         </div>
         
-        <!-- Section for displaying the accessibility audit results -->
         <div class="audit-section" id="auditSection" tabindex="0">
-            <!-- Accessibility audits will be listed here -->
+            <div class="audit-controls">
+                <button id="toggleAllOverlays" class="control-button">Toggle All Overlays</button>
+                <div class="filter-controls">
+                    <label for="filterIssues">Filter:</label>
+                    <select id="filterIssues">
+                        <option value="all">All Issues</option>
+                        <option value="critical">Critical</option>
+                        <option value="serious">Serious</option>
+                        <option value="moderate">Moderate</option>
+                        <option value="minor">Minor</option>
+                    </select>
+                </div>
+            </div>
+            <div class="audit-results"></div>
         </div>
-    </div>
+    </main>
 
-    <!-- Global tooltip container, hidden by default -->
     <div id="globalTooltip" class="global-tooltip"></div>
     
-    <!-- External JavaScript for functionality -->
+    <footer>
+        <p>&copy; 2025 AllyViz - Created by <a href="https://jonathanpagel.com" target="_blank">Jonathan Pagel</a></p>
+    </footer>
+    
     <script src="script.js"></script>
 </body>
 </html>
